@@ -29,8 +29,7 @@ V = V.*U;
 %OutputSignal = V(round(M/2)+1:round(M/2)+N,:);
 OutputSignal = V(N+M:-1:N+1,:)/N;           %别问我为什么。。。我也不知道！。。。
 %OutputSignal = [OutputSignal(100:-1:75,:);OutputSignal(1:50,:)];
-%OutputSignal = IFFTY(OutputSignal);
-
+OutputSignal = IFFTY(OutputSignal);
 
 end
 

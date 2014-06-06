@@ -11,14 +11,18 @@ NeedPC = 0;
 NeedKeystone = 1;
 NeedCRRC = 1;
 NeedDFTShift = 0;
-NeedTFR = 1;
+NeedTFR = 0;
 
 beta = 2.5;         %匹配滤波所加的凯泽窗的系数
 %[ F0,F_sample,B,PRF,T_pulse,T_measure,c ] = ParametersSystem();
 %[ L0,L_range,Omega,V0,a] = ParametersTarget();
-load('ReturnSimulate.mat');
+load('ReturnSimulate_9_4dx.mat');
 signal_process = signal_return;
+
 %signal_process = signal_return(:,1:250);
+%signal_process = signal_return(:,251:500);
+%signal_process = signal_return(:,501:750);
+%signal_process = signal_return(:,751:1000);
 
 
 figure,imshow(abs(signal_process.')/max(max(abs(signal_process)))),colormap(gray);
@@ -47,6 +51,15 @@ signal_process = signal_process(1:valid_length,:);
 figure,imagesc(abs(signal_process.')/max(max(abs(signal_process)))),colormap(gray);
 title('距离压缩结果');
 %%
+%越距离单元徙动校正及方位FFT成像
+%Keystone算法
+if(NeedKeystone)
+    signal_process = Keystone(signal_process);
+    %save('signal_process_afterKeystone.mat','signal_process');
+    figure,imagesc(abs(signal_process.')/max(max(abs(signal_process)))),colormap(gray);
+    title('Keystone校正结果');
+end
+%%
 %包络对齐
 if(NeedRA)
     tic
@@ -59,17 +72,11 @@ if(NeedPC)
     signal_process = PhaseCorrection(signal_process);
 end
 %%
-%越距离单元徙动校正及方位FFT成像
-%Keystone算法
-if(NeedKeystone)
-    signal_process = Keystone(signal_process);
-    %save('signal_process_afterKeystone.mat','signal_process');
-    figure,imagesc(abs(signal_process.')/max(max(abs(signal_process)))),colormap(gray);
-    title('Keystone校正结果');
-end
+
 %二阶相位校正
 if(NeedCRRC)
-    signal_process = CRRC(signal_process);
+    [Omega] = calculateRotateSpeed(signal_process);
+    signal_process = CRRC(signal_process,Omega);
     figure,imagesc(abs(signal_process.')/max(max(abs(signal_process)))),colormap(gray);
     title('CRRC校正结果');
 end
@@ -83,10 +90,8 @@ if(NeedDFTShift)
     K = 0.051;
     signal_process = DFT(signal_process,K);
 else
-    %signal_process = FFTY(signal_process);
+    signal_process = FFTY(signal_process);
 end
-
-
 
 if(NeedTFR)
     myshow(signal_process);
@@ -104,23 +109,23 @@ if(NeedTFR)
         output(:,m) = temp(:,100);
         waitbar(m/A_scale);
     end    
-    delete(h_tfr);
+    close(h_tfr);
     myshow(fftshift(output,1));
 end
 
 %%
 %结果图像处理
 
-%save('ImagingResult.mat','signal_process');
+save('ImagingResult.mat','signal_process');
 
 
 %%
 %显示结果
 %{
 figure
-mesh(output);
+mesh(abs(signal_process));
 %}
-%myshow(signal_process);
+myshow(signal_process);
 title('成像结果黑白图');
 end
 

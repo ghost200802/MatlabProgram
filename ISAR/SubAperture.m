@@ -42,14 +42,14 @@ for m = 2:N_Aperture
     [K(m),X(m)] = CaculateFactor(signal_process(:,:,1),signal_process(:,:,m));
 end
 %}
-%{
+
 K0 = 0.0125;
 X0 = 0;
 for m = 1:N_Aperture
    K(m) = 1/(1+K0*(2*m-1)); 
    X(m) = (m-1)*X0;
 end
-%}
+
 
 
 for m = 1:N_Aperture    
