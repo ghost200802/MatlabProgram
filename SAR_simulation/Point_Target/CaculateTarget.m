@@ -1,4 +1,4 @@
-function targetCondition = CaculateTarget(target,N_target,H0,L0,D,d,Bw)
+function targetCondition = CaculateTarget(target,N_target,H0,L0,D,d,Bw,t,dx)
 %CACULATETARGET Summary of this function goes here
 %   Detailed explanation goes here
 %对目标进行计算，得到的数组第一列还是后向散射系数，第二列是雷达坐标系中
@@ -6,8 +6,8 @@ function targetCondition = CaculateTarget(target,N_target,H0,L0,D,d,Bw)
 targetPosition = zeros(N_target,2); %计算目标点在时间t时的位置
 
 
-targetPosition(:,1) = sqrt((L0+target(:,2)).^2 + H0^2);
-targetPosition(:,2) = target(:,3)-d;
+targetPosition(:,1) = sqrt((L0+target(:,2)+t*target(:,4)).^2 + H0^2);
+targetPosition(:,2) = target(:,3)+target(:,5)-d;
 
     
 %targetPosition(:,1) = target(:,2)*cos(Omega*t)+target(:,3)*sin(Omega*t); %x'=x*cos(wt)+y*sin(wt)
@@ -15,7 +15,7 @@ targetPosition(:,2) = target(:,3)-d;
 
 targetCondition = zeros(N_target,3);
 
-targetCondition(:,2) = sqrt((targetPosition(:,1)).^2+(targetPosition(:,2).^2)); %目标点与雷达的距离
+targetCondition(:,2) = sqrt((targetPosition(:,1)).^2+(targetPosition(:,2).^2))+sqrt((targetPosition(:,1)).^2+((targetPosition(:,2)+dx).^2)); %目标点与雷达的双程距离
 targetCondition(:,3) = (D>= abs(target(:,3)-d)); %目标是否在成像范围内
 
 th = targetPosition(:,2)./targetCondition(:,2);

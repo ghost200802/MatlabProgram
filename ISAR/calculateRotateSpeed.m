@@ -13,7 +13,7 @@ entropy = zeros(1,N);
 Omega = (1:N)*detOmega;
 
 for i = 1:N
-    i
+    %i
     currentOmega = Omega(i);
     tempSignal = FFTX(CRRC(inputSignal,currentOmega));
     %myshow(tempSignal)
@@ -23,6 +23,9 @@ end
 
 figure
 plot(Omega,entropy)
+title('角速度搜索曲线')
+xlabel('转动角速度（rad/s）')
+ylabel('图像熵')
 
 [~,col] = find(entropy == min(min(entropy)));
 Omega(col);

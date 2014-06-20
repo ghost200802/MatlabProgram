@@ -6,7 +6,7 @@ function ReturnSimulate
 %还没有加入天线方向图！！！！------------------------------------------
 %%
 %获得原始数据及相关数据计算
-[ ~,F0,F_sample,B,PRF,T_pulse,c,H0,L0,L_min,L_max,Bw,D,d_min,d_max,Vr ] = ParametersSystem();
+[ ~,F0,F_sample,B,PRF,T_pulse,c,H0,L0,L_min,L_max,Bw,D,d_min,d_max,Vr,dx ] = ParametersSystem();
 [target,N_target] = Target();
 
 T_sample = 1/F_sample;                      %系统采样时间，单位为秒
@@ -34,10 +34,10 @@ signal_reference = exp(1i*(2*pi*F0*i_pulse+pi*K*i_pulse.^2));
 %生成回波数据
 h1 = waitbar(0,'生成数据');
 for i = 1:n_pulse
-    targetCondition = CaculateTarget(target,N_target,H0,L0,D,d_min+i/PRF*Vr,Bw);
+    targetCondition = CaculateTarget(target,N_target,H0,L0,D,d_min+i/PRF*Vr,Bw,i/PRF,dx);
     for k = 1:N_target
         if(targetCondition(k,3))
-            t_return = 2*targetCondition(k,2)/c - T_min;                                      %这里是从T_min开始也就是从接收回波开始计时后的时间，为了与回波接收的数据结相吻合
+            t_return = targetCondition(k,2)/c - T_min;                                      %这里是从T_min开始也就是从接收回波开始计时后的时间，为了与回波接收的数据结相吻合
             i_return = round(t_return/T_sample);                                              %这里计算的是在第几个采样脉冲时开始接收到回波信号
             signal_return_target = targetCondition(k,1)*exp(1i*(2*pi*F0*(i_pulse-(t_return-i_return*T_sample))+pi*K*(i_pulse-(t_return-i_return*T_sample)).^2));                  %这是每个目标的回波
             signal_return_real(i,i_return : i_return+i_pulselength-1) = signal_return_real(i,i_return : i_return+i_pulselength-1)+real(signal_return_target); %把每个目标的回波叠加进脉冲的接收回波

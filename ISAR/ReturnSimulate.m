@@ -4,7 +4,7 @@ function ReturnSimulate
 %本函数用来进行回波的模拟
 %%
 %获得原始数据及相关数据计算
-[ L0,L_range,Omega0,dOmega,V0,a] = ParametersTarget();
+[ L0,L_range,Omega0,dOmega,ddOmega,dddOmega,V0,a] = ParametersTarget();
 [ F0,F_sample,B,PRF,T_pulse,T_measure,c ] = ParametersSystem();
 [target,N_target] = Target();
 T_sample = 1/F_sample;   %系统采样时间，单位为秒
@@ -24,6 +24,8 @@ i_receive = round((T_max-T_min)/T_sample)+i_pulselength; %每次脉冲的接收窗采样序
 signal_return_real = zeros(n_pulse,i_receive);
 signal_return_imag = zeros(n_pulse,i_receive);   
 
+targetOmega = zeros(1,n_pulse);
+
 %%
 %生成参考信号
 signal_reference = exp(1i*(2*pi*F0*i_pulse+pi*K*i_pulse.^2));
@@ -32,7 +34,10 @@ signal_reference = exp(1i*(2*pi*F0*i_pulse+pi*K*i_pulse.^2));
 h1 = waitbar(0,'生成数据');
 for i = 1:n_pulse
     L = L0+V0*(i/PRF)+0.5*a*(i/PRF)^2;            %计算目标位置
-    Omega =Omega0+dOmega*(i/PRF);
+    Omega = Omega0+dOmega*(i/PRF)
+    dOmega = dOmega + ddOmega*(i/PRF);
+    ddOmega = ddOmega + dddOmega*(i/PRF);
+    targetOmega(i) = Omega;
     targetCondition = CaculateTarget(target,N_target,L,Omega,i/PRF);    
     for k = 1:N_target
         t_return = 2*targetCondition(k,2)/c - T_min;                                      %这里是从T_min开始也就是从接收回波开始计时后的时间，为了与回波接收的数据结相吻合
@@ -55,11 +60,16 @@ figure
 plot(real(signal_reference));
 title('参考信号');
 %}
+time = (1:n_pulse)*0.5/n_pulse;
+figure,plot(time,targetOmega)
+title('目标转动角速度')
+xlabel('成像时间')
+ylabel('角速度(rad/s)')
 %%
 %将结果进行格式匹配
 signal_return  = signal_return.';
 signal_reference = signal_reference.';    
 
-save('ReturnSimulate.mat','signal_return','signal_reference');
+save('ReturnSimulate_dw_ddw.mat','signal_return','signal_reference');
 end
 
