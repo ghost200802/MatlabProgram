@@ -1,0 +1,42 @@
+%机载参数
+H=500;%飞行高度
+Vs=65;%飞机航速
+c=3e8;%光速
+lambda=0.0086;%波长
+prf=4000;%PRF
+tau=2.4e-6;%脉宽
+B=300e6;%带宽
+k=B/tau;%距离向调频率
+fs=380e6;%采样频率
+dtr=1/fs;%距离向采样间隔
+delta_R=c/(2*fs);%距离向采样点之间的斜距
+tau_num=ceil(tau*fs);%距离采样点数
+CenterAngle=65*pi/180;
+Rs=H/cos(CenterAngle);%中心斜距
+Rs_gr=H*tan(CenterAngle);%中心地距
+La_t=0.1;%方位向发射天线长度
+La_r=0.1;%方位向接收天线长度
+Lr=0.0125;%距离向子天线长度
+BeamW_azi=0.0908;%方位向波束宽度
+BeamW_ran=15*pi/180;%距离向波束宽度
+Ls=BeamW_azi*Rs;%合成孔径长度
+Ts=Ls/Vs;%合成孔径时间
+num_azi_ref=round(Ts*prf);%方位向一个合成孔径时间采样点数
+Tazi=1*Ts;%方位向采样时间（合成孔径时间的倍数）
+nan=round(Tazi*prf);%方位采样样本数
+if mod(nan,2)==0
+    ta=(-nan/2:nan/2-1)/prf;
+else
+    ta=(-(nan-1)/2:(nan-1)/2)/prf;
+end
+azi_position=ta*Vs;%载机方位位置
+ka=2*Vs^2/lambda/Rs;%方位向多普勒调频率
+Rmin=H/cos(59.5*pi/180);%最小斜距
+Rmax=H/cos(69.5*pi/180);%最大斜距
+nrn=floor((Rmax-Rmin)/delta_R)+tau_num;
+Tr_ref=(-tau_num/2:nrn-1-tau_num/2)/fs;
+tr=(-tau_num/2:nrn-1-tau_num/2)/fs+2*Rmin/c;%距离向时间
+fr=((0:(nrn-1))-nrn/2)*fs/nrn;%距离向频率
+fa=prf/nan*(-nan/2:nan/2-1);%方位向频率
+squint_theta=0/180*pi;%斜视角
+fdc=2*Vs*sin(squint_theta)/lambda;
