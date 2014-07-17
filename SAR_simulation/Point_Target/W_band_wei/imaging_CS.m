@@ -82,7 +82,7 @@ alpha=Dref./D-1;
 Ssc=exp(1i*pi*Kr.*alpha.*(tao2.^2));        
 window =  kaiser(R_scale,beta);            %对滤波器进行加窗处理
 window = (window * ones(1,A_scale)).';
-sig=sig.*Ssc;
+sig=sig.*Ssc.*window;
 %距离向FFT
 sig=fftshift(fft(fftshift(sig.'))).';
 

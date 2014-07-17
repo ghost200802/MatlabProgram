@@ -5,7 +5,7 @@ clc
 close all
 clear all
 
-[ Fc,~,~,B,PRF,~,c,H0,L0,~,~,~,~,~,~,Vr ] = ParametersSystem();
+[ Fc,~,~,B,PRF,~,c,H0,~,L_min,L_max,~,~,~,~,Vr ] = ParametersSystem();
 beta = 2.5;         %匹配滤波所加的凯泽窗的系数
 
 [signal_process,signal_reference] = ReturnSimulate();
@@ -37,25 +37,30 @@ title('距离压缩结果');
 %RCMC
 signal_process = FFTY(signal_process);
 
-
-
-shiftArray = zeros(1,A_scale);
+%shiftArray = zeros(R_scale,A_scale);
+R_min = sqrt(H0^2+L_min^2);
+R_max = sqrt(H0^2+L_max^2);
+R = R_min + (R_max-R_min)/R_scale*(1:R_scale);
 
 for i = 1:A_scale
-    shift = (-1/8) * (c/Fc)^2 * sqrt(H0^2+L0^2) * (round(i-A_scale/2)/A_scale*PRF)^2 / Vr^2 * 2*B/c;
-    shiftArray(i) = shift;
-    signal_process(i,:) = circshift(signal_process(i,:),[0,round(shift)]);
-    interpPoints = (1:R_scale) - shift + round(shift);
+    shift = (-1/8) * (c/Fc)^2 * R * (round(i-A_scale/2)/A_scale*PRF)^2 / Vr^2 * 2*B/c;
+    %shiftArray(:,i) = shift.';
+    interpPoints = (1:R_scale) - shift;
     signal_process(i,:) = interp1(1:R_scale,signal_process(i,:),interpPoints,'spline');
 end
+%figure,plot(shiftArray(10,:))
+%figure,plot(shiftArray(200,:))
 %%
 %方位向压缩
-Ka = 2*Vr^2/(c/Fc)/sqrt(H0^2+L0^2);
-Haz = (exp(-1i*pi*(round((1:A_scale)-A_scale/2)/A_scale*PRF).^2/Ka)).' * ones(1,R_scale) ;
+Ka = 2*Vr^2/(c/Fc)./R;
+Haz = zeros(A_scale,R_scale);
+for i = 1:R_scale
+    Haz(:,i) = (exp(-1i*pi*(round((1:A_scale)-A_scale/2)/A_scale*PRF).^2/Ka(i))).';
+end
 signal_process = signal_process .* Haz;
 signal_process = IFFTY(signal_process);
 myshow(signal_process)
 title('方位压缩结果');
 
-%Point_Analyse_sure(signal_process,32,64)
+Point_Analyse_sure(signal_process,32,64)
 end

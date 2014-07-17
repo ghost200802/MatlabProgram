@@ -10,7 +10,7 @@ function [signal_return,signal_reference] = ReturnSimulate
 
 T_sample = 1/F_sample;                      %系统采样时间，单位为秒
 R_min = sqrt(H0^2 + L_min^2);               %最早接受数据对应的目标距离，也即最小的接收数据的距离
-R_max = sqrt(H0^2 + L_max^2 + D^2);         %最晚接收数据对应的目标距离，也即最大的接收数据的距离
+R_max = sqrt(H0^2 + L_max^2);               %最晚接收数据对应的目标距离，也即最大的接收数据的距离
 T_min = 2*R_min/c;                          %最早的接收数据时间
 T_max = 2*R_max/c;                          %最晚的接收数据时间
 K = B/T_pulse;                              %信号的调频率
