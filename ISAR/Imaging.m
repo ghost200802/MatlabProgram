@@ -16,7 +16,7 @@ NeedTFR = 0;
 beta = 2.5;         %匹配滤波所加的凯泽窗的系数
 %[ F0,F_sample,B,PRF,T_pulse,T_measure,c ] = ParametersSystem();
 %[ L0,L_range,Omega,V0,a] = ParametersTarget();
-load('ReturnSimulate_dw_ddw.mat');
+load('ReturnSimulate_9_4dx.mat');
 
 signal_process = signal_return;
 %signal_process = signal_return(:,1:250);

@@ -62,5 +62,5 @@ signal_process = IFFTY(signal_process);
 myshow(signal_process)
 title('方位压缩结果');
 
-Point_Analyse_sure(signal_process,32,64)
+%Point_Analyse_sure(signal_process,32,64)
 end
