@@ -37,19 +37,21 @@ title('距离压缩结果');
 %RCMC
 signal_process = FFTY(signal_process);
 
-%shiftArray = zeros(R_scale,A_scale);
+shiftArray = zeros(R_scale,A_scale);
 R_min = sqrt(H0^2+L_min^2);
 R_max = sqrt(H0^2+L_max^2);
 R = R_min + (R_max-R_min)/R_scale*(1:R_scale);
 
 for i = 1:A_scale
     shift = (-1/8) * (c/Fc)^2 * R * (round(i-A_scale/2)/A_scale*PRF)^2 / Vr^2 * 2*B/c;
-    %shiftArray(:,i) = shift.';
+    shiftArray(:,i) = shift.';
     interpPoints = (1:R_scale) - shift;
     signal_process(i,:) = interp1(1:R_scale,signal_process(i,:),interpPoints,'spline');
 end
-%figure,plot(shiftArray(10,:))
-%figure,plot(shiftArray(200,:))
+figure,plot(shiftArray(10,:))
+figure,plot(shiftArray(200,:))
+myshow(IFFTY(signal_process));
+title('徙动校正结果');
 %%
 %方位向压缩
 Ka = 2*Vr^2/(c/Fc)./R;
