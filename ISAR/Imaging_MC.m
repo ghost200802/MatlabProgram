@@ -6,8 +6,8 @@ clear all;
 clc;
 %%
 %初始化
-NeedRA = 0;
-NeedPC = 0;
+NeedRA = 1;
+NeedPC = 1;
 NeedKeystone = 1; %need
 NeedCRRC = 1; %need
 NeedDFTShift = 0;
@@ -16,24 +16,26 @@ NeedTFR = 0;
 beta = 2.5;         %匹配滤波所加的凯泽窗的系数
 %[ F0,F_sample,B,PRF,T_pulse,T_measure,c ] = ParametersSystem();
 %[ L0,L_range,Omega,V0,a] = ParametersTarget();
-load('ReturnSimulate_9_4dx.mat');
+
+% 载入数据
+ ReturnSimulate();
+
+load('ReturnSimulate_v0_a0.mat');
+% load('ReturnSimulate_9_4dx.mat');
 
 signal_process = signal_return;
-%signal_process = signal_return(:,1:250);
-%signal_process = signal_return(:,251:500);
-%signal_process = signal_return(:,501:750);
-%signal_process = signal_return(:,751:1000);
 
 
-figure,imshow(abs(signal_process.')/max(max(abs(signal_process)))),colormap(gray);
-title('回波信号图');
+
+% figure,imshow(abs(signal_process.')/max(max(abs(signal_process)))),colormap(gray);
+% title('回波信号图');
 %%
 %距离向压缩
 tic
 [R_scale A_scale] = size(signal_process);
 signal_fft = (FFTY(signal_process));
-figure,imshow(abs((signal_fft).')/max(max(abs(signal_fft)))),colormap(gray);
-title('回波信号多普勒域图');
+% figure,imshow(abs((signal_fft).')/max(max(abs(signal_fft)))),colormap(gray);
+% title('回波信号多普勒域图');
 
 
 i_pulselength = length(signal_reference);
@@ -66,8 +68,6 @@ end
 [A_scale,R_scale] = size(signal_process);
 
 toc
-
-
 %%
 %包络对齐
 if(NeedRA)
@@ -80,12 +80,13 @@ end
 if(NeedPC)
     signal_process = PhaseCorrection(signal_process);
 end
+
 %%
 tic
 %二阶相位校正
 if(NeedCRRC)
-    [Omega] = calculateRotateSpeed(signal_process)
-    %Omega = 0.102;
+%     [Omega] = calculateRotateSpeed(signal_process)
+    Omega = 0.102;
     %Omega = 0.092;
     %Omega = 0.095;
     signal_process = CRRC(signal_process,Omega);
@@ -94,15 +95,6 @@ if(NeedCRRC)
 end
 toc
 
-signal_process1 = FFTY(signal_process(:,1:240).');
-signal_process2 = FFTY(signal_process(:,241:480).');
-signal_process3 = FFTY(signal_process(:,481:720).');
-signal_process4 = FFTY(signal_process(:,721:960).');
-
-
-% signal_process = signal_process(:,1:320);
-% signal_process = signal_process(:,321:640);
-% signal_process = signal_process(:,641:960);
 
 signal_process = signal_process.';
 
@@ -135,19 +127,6 @@ if(NeedTFR)
     close(h_tfr);
     myshow(fftshift(output,1));
 end
-
-%%
-%结果图像处理
-
-
-
-% save('ImagingResult.mat','signal_process');
-% save('ImagingResult_1.mat','signal_process');
-% save('ImagingResult_2.mat','signal_process');
-% save('ImagingResult_3.mat','signal_process');
-% save('ImagingResult_4.mat','signal_process');
-save('ImagingResult.mat','signal_process1','signal_process2','signal_process3','signal_process4');
-
 
 %%
 %显示结果

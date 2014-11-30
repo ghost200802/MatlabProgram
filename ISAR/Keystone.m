@@ -15,9 +15,11 @@ N_Fc = min(R_scale,max(0,N_Fc));
 %信号预处理
 input_signal = FFTY(input_signal);
 input_signal = circshift(input_signal,[round(N_Fc-R_scale/2),0]);
+% input_signal = circshift(input_signal,[0,round(N_Fc-R_scale/2)]);
 
 %%
 %Keystone变换处理
+
 keystone_signal = zeros(R_scale,A_scale);
 N_Fc_new = round(R_scale/2);
 Ratio = (Fc./(Fc+((1:R_scale)-N_Fc_new)*F_sample/R_scale));    %此式即Ratio = fc/(fc+f),其中f为频谱图中某点对应的频率，计算方法为(x-x_mid)*F_sample/R_scale
@@ -34,18 +36,20 @@ for m = 1:R_scale
     end
     %}
     n_old = Ratio(m)*((1:A_scale)-A_scale/2)+A_scale/2;
-    n_old(n_old<1) = 1;
-    n_old(n_old>A_scale) = A_scale;    
+%     n_old(n_old<1) = 1;
+%     n_old(n_old>A_scale) = A_scale;    
     keystone_signal(m,:) = complex(spline(1:A_scale,real(input_signal(m,:).'),n_old),spline(1:A_scale,imag(input_signal(m,:).'),n_old)).';
 end
 
-output_signal = circshift(keystone_signal,[0,-round(N_Fc-R_scale/2)]);
+% output_signal = circshift(keystone_signal,[0,-round(N_Fc-R_scale/2)]);
+output_signal = circshift(keystone_signal,[-round(N_Fc-R_scale/2),0]);
 A_scale_min = round(A_scale*(1-min(Ratio))/2);
 A_scale_max = A_scale-A_scale_min;
 output_signal = output_signal(:,A_scale_min:A_scale_max);
-%figure,imagesc(abs(input_signal.')/max(max(abs(input_signal)))),colormap(gray)
-figure,imagesc(abs(output_signal.')/max(max(abs(keystone_signal)))),colormap(gray) 
-title('Keystone校正后的多普勒域图')
+% myshow(output_signal)
+% figure,imagesc(abs(input_signal.')/max(max(abs(input_signal)))),colormap(gray)
+% figure,imagesc(abs(output_signal.')/max(max(abs(keystone_signal)))),colormap(gray) 
+% title('Keystone校正后的多普勒域图')
 output_signal = IFFTY(output_signal);
 end
 

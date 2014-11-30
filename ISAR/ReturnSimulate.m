@@ -2,6 +2,8 @@ function ReturnSimulate
 %RETURNSIMULATE Summary of this function goes here
 %   Detailed explanation goes here
 %本函数用来进行回波的模拟
+
+
 %%
 %获得原始数据及相关数据计算
 [ L0,L_range,Omega0,dOmega,ddOmega,dddOmega,V0,a] = ParametersTarget();
@@ -34,7 +36,7 @@ signal_reference = exp(1i*(2*pi*F0*i_pulse+pi*K*i_pulse.^2));
 h1 = waitbar(0,'生成数据');
 for i = 1:n_pulse
     L = L0+V0*(i/PRF)+0.5*a*(i/PRF)^2;            %计算目标位置
-    Omega = Omega0+dOmega*(i/PRF)
+    Omega = Omega0+dOmega*(i/PRF);
     dOmega = dOmega + ddOmega*(i/PRF);
     ddOmega = ddOmega + dddOmega*(i/PRF);
     targetOmega(i) = Omega;
@@ -60,16 +62,17 @@ figure
 plot(real(signal_reference));
 title('参考信号');
 %}
-time = (1:n_pulse)*0.5/n_pulse;
-figure,plot(time,targetOmega)
-title('目标转动角速度')
-xlabel('成像时间')
-ylabel('角速度(rad/s)')
+% 绘制目标转动角速度
+% time = (1:n_pulse)*0.5/n_pulse;
+% figure,plot(time,targetOmega)
+% title('目标转动角速度')
+% xlabel('成像时间')
+% ylabel('角速度(rad/s)')
 %%
 %将结果进行格式匹配
 signal_return  = signal_return.';
 signal_reference = signal_reference.';    
 
-save('ReturnSimulate_dw_ddw.mat','signal_return','signal_reference');
+save('ReturnSimulate_v0_a0.mat','signal_return','signal_reference');
 end
 
