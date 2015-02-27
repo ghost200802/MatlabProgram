@@ -36,6 +36,7 @@ signal_reference = exp(1i*(2*pi*F0*i_pulse+pi*K*i_pulse.^2));
 h1 = waitbar(0,'生成数据');
 for i = 1:n_pulse
     L = L0+V0*(i/PRF)+0.5*a*(i/PRF)^2;            %计算目标位置
+    %L = L0+V0*(i/PRF)+0.5*a*(i/PRF)^2;            %计算目标位置
     Omega = Omega0+dOmega*(i/PRF);
     dOmega = dOmega + ddOmega*(i/PRF);
     ddOmega = ddOmega + dddOmega*(i/PRF);
@@ -73,6 +74,6 @@ title('参考信号');
 signal_return  = signal_return.';
 signal_reference = signal_reference.';    
 
-save('ReturnSimulate_v0_a0.mat','signal_return','signal_reference');
+save('ReturnSimulate_v0_a0_2_0.mat','signal_return','signal_reference');
 end
 

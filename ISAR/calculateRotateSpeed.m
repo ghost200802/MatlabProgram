@@ -3,33 +3,36 @@ function [ rotateSpeed ] = calculateRotateSpeed( inputSignal )
 %   Detailed explanation goes here
 %[ ~,~,Omega0,~,~,~] = ParametersTarget();
 
+loopCount = 5;
+N = 5;
+detOmega = 0.0001;
+OmegaShift = 0;
 
-N = 200;
-detOmega = 0.001;
+for loop = 1:loopCount
+    entropy = zeros(1,2*N+1);
 
+    Omega = (-N:N)*detOmega*(2*N)^(loopCount-loop)+OmegaShift;
 
-entropy = zeros(1,N);
+    for i = 1:2*N+1
+        %i
+        currentOmega = Omega(i);
+        tempSignal = FFTX(CRRC(inputSignal,currentOmega));
+        %myshow(tempSignal)
+        tempSignal = abs(tempSignal);
+        entropy(i) = sum(tempSignal(tempSignal~=0).*log(tempSignal(tempSignal~=0)));
+    end
 
-Omega = (1:N)*detOmega;
+    figure
+    plot(Omega,entropy)
+    title('角速度搜索曲线')
+    xlabel('转动角速度（rad/s）')
+    ylabel('图像熵')
 
-for i = 1:N
-    %i
-    currentOmega = Omega(i);
-    tempSignal = FFTX(CRRC(inputSignal,currentOmega));
-    %myshow(tempSignal)
-    tempSignal = abs(tempSignal);
-    entropy(i) = sum(tempSignal(tempSignal~=0).*log(tempSignal(tempSignal~=0)));
+    [~,col] = find(entropy == min(min(entropy)));
+    Omega(col(1))
+
+    OmegaShift = Omega(col(1));
 end
 
-figure
-plot(Omega,entropy)
-title('角速度搜索曲线')
-xlabel('转动角速度（rad/s）')
-ylabel('图像熵')
-
-[~,col] = find(entropy == min(min(entropy)));
-Omega(col);
-
-rotateSpeed = Omega(col);
-%rotateSpeed = Omega0;
+rotateSpeed = OmegaShift
 %dRotateSpeed = 0.01;

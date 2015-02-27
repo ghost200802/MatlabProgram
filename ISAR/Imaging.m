@@ -84,7 +84,7 @@ end
 tic
 %二阶相位校正
 if(NeedCRRC)
-    [Omega] = calculateRotateSpeed(signal_process)
+    [Omega] = calculateRotateSpeed(signal_process);
     %Omega = 0.102;
     %Omega = 0.092;
     %Omega = 0.095;

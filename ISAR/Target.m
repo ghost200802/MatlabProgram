@@ -3,7 +3,7 @@ function [target N_target] = Target
 %   Detailed explanation goes here
 %本函数用来读取目标
 %目标的格式 后向散射系数， 目标中心坐标系x坐标/m， 目标中心坐标系y坐标/m
-fid=fopen('Target_9_4dx_range.txt');
+fid=fopen('plane.txt');
 target = zeros(1,3);
 i = 0;
 while ~feof(fid)
