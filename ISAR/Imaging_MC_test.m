@@ -1,4 +1,4 @@
-function  Imaging_MC
+function  Imaging_MC_test
 %IMAGING Summary of this function goes here
 %   Detailed explanation goes here
 close all;
@@ -27,9 +27,7 @@ beta = 2.5;         %匹配滤波所加的凯泽窗的系数
 %load('ReturnSimulate_9_4dx.mat');
 %load('ReturnSimulate_plane1.mat');
 load('ReturnSimulate_plane2.mat');
-if(NeedWriteImage)
-    imwrite(real(signal_return.'),'Imaging_MC_1回波信号.tiff','tiff');
-end
+
 signal_process = signal_return;
 
 
@@ -70,9 +68,7 @@ signal_process = signal_process(1:valid_length,:);
 figure,imagesc(abs(signal_process.')/max(max(abs(signal_process)))),colormap(gray);
 title('距离压缩结果');
 toc
-if(NeedWriteImage)
-    imwrite(abs(signal_process.')/max(max(abs(signal_process))),'Imaging_MC_2距离压缩.tiff','tiff');
-end
+
 %%
 %重心对齐
 signal_center = zeros(1,A_scale);
@@ -82,13 +78,9 @@ end
 if(NeedCA)
     
     figure,plot(signal_center)
-    xlabel('慢时间点数')
-    ylabel('回波包络加权中心')
     ka = polyfit(1:A_scale,signal_center,3);
     signal_center = ka(1)*(1:A_scale).^3+ka(2)*(1:A_scale).^2+ka(3)*(1:A_scale);
     figure,plot(signal_center)
-    xlabel('慢时间点数')
-    ylabel('目标重心位移量估计值')
 
     if(true)
         signal_process = FFTY(signal_process);
@@ -98,7 +90,21 @@ if(NeedCA)
         signal_process = IFFTY(signal_process);
     end
 end
-
+%%
+%包络对齐
+if(NeedRA)
+    tic
+    signal_process = RangeAlignment(signal_process,signal_center);
+    toc
+    if(NeedWriteImage)
+        imwrite(abs(signal_process')/max(max(abs(signal_process))),'Imaging_MC_test_4包络对齐结果.tiff','tiff');
+    end
+end
+%%
+%初相校正
+if(NeedPC)
+    signal_process = PhaseCorrection_Doppler(signal_process);
+end
 %%
 tic
 %越距离单元徙动校正及方位FFT成像
@@ -108,33 +114,12 @@ if(NeedKeystone)
     %save('signal_process_afterKeystone.mat','signal_process');
     figure,imagesc(abs(signal_process.')/max(max(abs(signal_process)))),colormap(gray);
     title('Keystone校正结果');
-    if(NeedWriteImage)
-        imwrite(abs(signal_process.')/max(max(abs(signal_process))),'Imaging_MC_3Keystone校正.tiff','tiff');
-    end
 end
 
 [A_scale,R_scale] = size(signal_process);
 
 toc
-%%
-%包络对齐
-if(NeedRA)
-    tic
-    signal_process = RangeAlignment(signal_process,signal_center);
-    toc
-    %%
-    %显示包络对齐结果
-    figure,imagesc(abs(signal_process')/max(max(abs(signal_process)))),colormap(gray);
-    title('包络对齐结果');
-    if(NeedWriteImage)
-        imwrite(abs(signal_process')/max(max(abs(signal_process))),'Imaging_MC_4包络对齐结果.tiff','tiff');
-    end
-end
-%%
-%初相校正
-if(NeedPC)
-    signal_process = PhaseCorrection_Doppler(signal_process);
-end
+
 
 %%
 tic
@@ -193,8 +178,8 @@ save('plane_result.mat','signal_process');
 myshow(signal_process);
 title('成像结果黑白图');
 if(NeedWriteImage)
-    imwrite(abs(signal_process)/max(max(abs(signal_process))),'Imaging_MC_5相位补偿前.tiff','tiff');
-    %imwrite(abs(signal_process)/max(max(abs(signal_process))),'Imaging_MC_6成像结果黑白图.tiff','tiff');
+    imwrite(abs(signal_process)/max(max(abs(signal_process))),'Imaging_MC_test_5相位补偿前.tiff','tiff');
+    %imwrite(abs(signal_process)/max(max(abs(signal_process))),'Imaging_MC_test_6成像结果黑白图.tiff','tiff');
 end
 end
 

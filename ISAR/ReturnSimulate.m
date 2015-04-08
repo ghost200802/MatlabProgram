@@ -9,7 +9,7 @@ function ReturnSimulate
 [ L0,L_range,Omega0,dOmega,ddOmega,dddOmega,V0,a] = ParametersTarget();
 [ F0,F_sample,B,PRF,T_pulse,T_measure,c ] = ParametersSystem();
 [target,N_target] = Target();
-T_sample = 1/F_sample;   %系统采样时间，单位为秒
+T_sample = 1/F_sample;   %系统采样时间，单位为秒T
 L_min = L0-L_range;     %最早接受数据对应的目标距离，也即最小的接收数据的距离
 L_max = L0+L_range;     %最晚接收数据对应的目标距离，也即最大的接收数据的距离
 T_min = 2*L_min/c;      %最早的接收数据时间
@@ -74,6 +74,7 @@ title('参考信号');
 signal_return  = signal_return.';
 signal_reference = signal_reference.';    
 
-save('ReturnSimulate_v0_a0_2_0.mat','signal_return','signal_reference');
+save('ReturnSimulate_9_4dx.mat','signal_return','signal_reference');
+%save('ReturnSimulate_plane2.mat','signal_return','signal_reference');
 end
 

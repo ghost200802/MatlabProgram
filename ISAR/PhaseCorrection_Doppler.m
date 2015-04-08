@@ -1,7 +1,7 @@
-function [ output_signal ] = PhaseCorrection( input_signal )
+function [ output_signal ] = PhaseCorrection_Doppler( input_signal )
 %PHASECORRECTION Summary of this function goes here
 %   Detailed explanation goes here
-%使用单特显点法进行相位校正
+%使用多普勒跟踪法进行初相校正
 %%
 %初始化
 output_signal = input_signal;
@@ -23,18 +23,26 @@ for i = 1:R_scale
 end
 %%
 %显示各距离单元数据方差
-figure,plot(S)
-title('各距离单元数据方差');
+%figure,plot(S)
+%title('各距离单元数据方差');
+
+for i = 2:A_scale
+    e = conj(output_signal(:,i-1)).*output_signal(:,i);
+    correctPhase = sum(e)/abs(sum(e));
+    output_signal(:,i) = output_signal(:,i)/correctPhase;
+end
 %%
+%{
+%%
+%利用特显点对图像进行初相校正
 %寻找特显点
 i_sp = find(S==min(S));
 i_sp = i_sp(1);
-%%
-%利用特显点对图像进行初相校正
 for i = 2:A_scale
     if(output_signal(i_sp,i)~=0)
         output_signal(:,i) = output_signal(:,i)*exp((-1)*1i*(angle(output_signal(i_sp,i))-angle(output_signal(i_sp,i-1))));
     end
-end   
+end
+%}
 end
 

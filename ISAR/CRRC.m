@@ -1,4 +1,4 @@
-function [ output_signal] = CRRC( input_signal,Omega)
+function [ output_signal] = CRRC( input_signal,Omega )
 %SRRC Summary of this function goes here
 %   Detailed explanation goes here
 [ F0,~,B,PRF,~,~,c ] = ParametersSystem();

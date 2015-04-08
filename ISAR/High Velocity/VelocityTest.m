@@ -14,10 +14,10 @@ i_pulse = i_pulse*T_sample; %发射脉冲的时间采样信号
 %%
 %生成参考信号
 %signal_reference = exp(1i*(2*pi*F0*i_pulse_1/(1+2*V0/c)+pi*K/(1+(-1)*V0/c)*i_pulse_1.^2));
-V0 = 250;
+V0 = 0;
 alpha = (c-V0)/(c+V0);
-signal_reference = exp(1i*(2*pi*F0*alpha*i_pulse+pi*K*alpha^2*i_pulse.^2));
-%signal_reference = exp(1i*(2*pi*F0*i_pulse+pi*K*i_pulse.^2));
+%signal_reference = exp(1i*(2*pi*F0*alpha*i_pulse+pi*K*alpha^2*i_pulse.^2));
+signal_reference = exp(1i*(2*pi*F0*i_pulse+pi*K*i_pulse.^2));
 signal_return = exp(1i*(2*pi*F0*alpha*i_pulse+pi*K*alpha^2*i_pulse.^2));
 
 signal_reference_fft = conj((fft(signal_reference)));
@@ -35,8 +35,8 @@ signal_out_fft_p(:,1:y) = signal_out_fft;
 
 signal_out_p = (ifft(signal_out_fft_p));
 signal_out_p = circshift(signal_out_p,[0,100]);
-signal_out_p = signal_out_p(1,1:500);
-figure(1),plot(abs(signal_out_p)),hold on;
+signal_out_p = signal_out_p(1,1:1000);
+figure(1),plot(abs(signal_out_p),'b'),hold on;
 %figure(2),plot(20*log10(abs(signal_out_p)/max(abs(signal_out_p)))),hold on;
 
 

@@ -3,7 +3,7 @@ function [ rotateSpeed ] = calculateRotateSpeed( inputSignal )
 %   Detailed explanation goes here
 %[ ~,~,Omega0,~,~,~] = ParametersTarget();
 
-loopCount = 5;
+loopCount = 4;
 N = 5;
 detOmega = 0.0001;
 OmegaShift = 0;
@@ -20,8 +20,12 @@ for loop = 1:loopCount
         %myshow(tempSignal)
         tempSignal = abs(tempSignal);
         entropy(i) = sum(tempSignal(tempSignal~=0).*log(tempSignal(tempSignal~=0)));
+        %entropy(i) = imageEntropy(tempSignal);
+        %entropy(i) = (-1)*imageContrast(tempSignal);
     end
-
+    
+    %entropy = entropy/sum(sum(abs(inputSignal)))/10;
+    
     figure
     plot(Omega,entropy)
     title('½ÇËÙ¶ÈËÑË÷ÇúÏß')
@@ -29,10 +33,10 @@ for loop = 1:loopCount
     ylabel('Í¼ÏñìØ')
 
     [~,col] = find(entropy == min(min(entropy)));
-    Omega(col(1))
+    Omega(col(1));
 
     OmegaShift = Omega(col(1));
 end
 
-rotateSpeed = OmegaShift
+rotateSpeed = OmegaShift;
 %dRotateSpeed = 0.01;

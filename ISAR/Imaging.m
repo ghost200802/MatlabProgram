@@ -6,10 +6,11 @@ clear all;
 clc;
 %%
 %初始化
+NeedWriteImage = 1;
 NeedRA = 0;
 NeedPC = 0;
-NeedKeystone = 1; %need
-NeedCRRC = 1; %need
+NeedKeystone = 0; %need
+NeedCRRC = 0; %need
 NeedDFTShift = 0;
 NeedTFR = 0;
 
@@ -157,5 +158,8 @@ mesh(abs(signal_process));
 %}
 myshow(signal_process);
 title('成像结果黑白图');
+if(NeedWriteImage)
+    imwrite(abs(signal_process)/max(max(abs(signal_process))),'Imaging_成像结果黑白图.tiff','tiff');
+end
 end
 
